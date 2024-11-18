@@ -8,24 +8,7 @@ import sys
 import hashlib
 from cryptography.fernet import Fernet
 
-def generate_key():
-    return Fernet.generate_key()
-
-def save_key(key):
-    key_file_path = get_file_path("secret.key")
-    with open(key_file_path, "wb") as key_file:
-        key_file.write(key)
-
-def load_key():
-    key_file_path = get_file_path("secret.key")
-    if os.path.exists(key_file_path):
-        with open(key_file_path, "rb") as key_file:
-            return key_file.read()
-    else:
-        # Generate and save the key if it doesn't exist
-        key = generate_key()
-        save_key(key)
-        return key
+key = "RmcAk5aS6JpmjwflBzjmVgfzB11d1VZxqkkhsPGRvqA="
 
 # Encrypt data using the provided key
 def encrypt_data(data, key):
@@ -83,7 +66,6 @@ validate = (m.register(NumOnly), '%P')
 
 # Global variable for storing hashed password
 user_password_hash = None
-key = load_key()  # Load encryption key
 
 # Function to set the user's password on first launch
 def set_user_password():
@@ -97,6 +79,7 @@ def set_user_password():
             file.write(encrypted_password)
         set_file_permissions(password_file_path)
         load_textbox_contents()  # Load notes after setting password
+        m.deiconify()  # Show the main window after password is set
     else:
         messagebox.showwarning("Warning", "Password cannot be empty.")
 
@@ -219,17 +202,17 @@ l.configure(bg="#52555a")
 l.grid(row=0, column=2, sticky='n', pady=10)
 
 # Checkbuttons for options
-Numbers = tk.Checkbutton(main_frame, text='Numbers', bg="#555555")
+Numbers = tk.Checkbutton(main_frame, text='Numbers', bg="#555555", activebackground="#555555")
 Numbers.var = tk.BooleanVar()  
 Numbers.config(variable=Numbers.var)
 Numbers.grid(row=1, column=0, sticky="w")
 
-Capitals = tk.Checkbutton(main_frame, text='Capital Letters', bg="#555555")
+Capitals = tk.Checkbutton(main_frame, text='Capital Letters', bg="#555555", activebackground="#555555")
 Capitals.var = tk.BooleanVar()
 Capitals.config(variable=Capitals.var)
 Capitals.grid(row=2, column=0, sticky="w")
 
-SpecialChar = tk.Checkbutton(main_frame, text='Special Characters', bg="#555555")
+SpecialChar = tk.Checkbutton(main_frame, text='Special Characters', bg="#555555", activebackground="#555555")
 SpecialChar.var = tk.BooleanVar()
 SpecialChar.config(variable=SpecialChar.var)
 SpecialChar.grid(row=3, column=0, sticky="w")
