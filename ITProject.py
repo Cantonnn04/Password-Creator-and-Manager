@@ -3,7 +3,6 @@ from tkinter import simpledialog, messagebox
 import random
 import string
 import os
-import hashlib
 import stat
 import sys
 
@@ -45,50 +44,36 @@ def NumOnly(new_value):
 
 validate = (m.register(NumOnly), '%P')
 
-# Hashing function for password
-def hash_password(password):
-    return hashlib.sha256(password.encode()).hexdigest()
-
-# XOR encryption/decryption function
-def xor_encrypt_decrypt(data, key):
-    return ''.join(chr(ord(c) ^ ord(key[i % len(key)])) for i, c in enumerate(data))
-
-# Secret key for XOR encryption of the saved password
-SECRET_KEY = "Leavemealone"
-
-# Global variable for storing hashed password
-hashed_password = None
+# Global variable for storing plaintext password
+user_password = None
 
 # Function to set the user's password on first launch
 def set_user_password():
-    global hashed_password
+    global user_password
     user_password = simpledialog.askstring("Set Password", "Please set a password for your notes:", show="*")
     if user_password:
-        hashed_password = hash_password(user_password)
-        encrypted_hashed_password = xor_encrypt_decrypt(hashed_password, SECRET_KEY)
-        password_file_path = get_file_path("AYrm6mfaEW03egD0necC8Yp06.txt")
+        password_file_path = get_file_path("user_password.txt")
         with open(password_file_path, "w") as file:
-            file.write(encrypted_hashed_password)
+            file.write(user_password)
         set_file_permissions(password_file_path)  # Set file permissions
         load_textbox_contents()  # Load notes after setting password
     else:
         messagebox.showwarning("Warning", "Password cannot be empty.")
 
-# Function to load hashed password from file
+# Function to load user password from file
 def load_user_password():
-    global hashed_password
-    password_file_path = get_file_path("AYrm6mfaEW03egD0necC8Yp06.txt")
+    global user_password
+    password_file_path = get_file_path("user_password.txt")
     if os.path.exists(password_file_path):
         with open(password_file_path, "r") as file:
-            encrypted_hashed_password = file.read().strip()
-            hashed_password = xor_encrypt_decrypt(encrypted_hashed_password, SECRET_KEY)
+            user_password = file.read().strip()
     else:
         set_user_password()
 
 # Function to verify the user's password
 def verify_password():
     entered_password = simpledialog.askstring("Enter Password", "Please enter your password:", show="*")
-    return hash_password(entered_password) == hashed_password
+    return entered_password == user_password
 
 # Function to generate passwords
 def generate_passwords():
@@ -139,14 +124,12 @@ def copy_to_clipboard(password):
     m.clipboard_append(password) 
     m.update() 
 
-# Function to save contents of the textbox to an encrypted file
+# Function to save contents of the textbox to a plaintext file
 def save_textbox_contents():
     if verify_password():
-        key = hashed_password[:32]  # Use the first 32 chars of the hashed password as the XOR key
-        encrypted_text = xor_encrypt_decrypt(textbox.get("1.0", tk.END).strip(), key)
-        notes_file_path = get_file_path("kU9RLxOfNN5qL9oWyNLVsSq8x.txt")
+        notes_file_path = get_file_path("user_notes.txt")
         with open(notes_file_path, "w") as file:
-            file.write(encrypted_text)
+            file.write(textbox.get("1.0", tk.END).strip())
         set_file_permissions(notes_file_path)  # Set file permissions
         messagebox.showinfo("Success", "Notes saved successfully.")
     else:
@@ -154,13 +137,11 @@ def save_textbox_contents():
 
 # Function to load saved contents into the textbox at startup
 def load_textbox_contents():
-    notes_file_path = get_file_path("kU9RLxOfNN5qL9oWyNLVsSq8x.txt")
+    notes_file_path = get_file_path("user_notes.txt")
     if os.path.exists(notes_file_path):
-        key = hashed_password[:32]  # Use the first 32 chars of the hashed password as the XOR key
         with open(notes_file_path, "r") as file:
-            encrypted_content = file.read()
-            decrypted_content = xor_encrypt_decrypt(encrypted_content, key)
-            textbox.insert("1.0", decrypted_content)
+            content = file.read()
+            textbox.insert("1.0", content)
 
 # Function to see notes
 def see_notes():
@@ -172,17 +153,17 @@ def see_notes():
 
 # Function to reset notes and password
 def reset_notes_and_password():
-    global hashed_password
+    global user_password
     confirm = messagebox.askyesno("Confirm Reset", "Are you sure you want to reset your notes and password?")
     if confirm:
-        notes_file_path = get_file_path("kU9RLxOfNN5qL9oWyNLVsSq8x.txt")
-        password_file_path = get_file_path("AYrm6mfaEW03egD0necC8Yp06.txt")
+        notes_file_path = get_file_path("user_notes.txt")
+        password_file_path = get_file_path("user_password.txt")
         os.remove(notes_file_path) if os.path.exists(notes_file_path) else None
         os.remove(password_file_path) if os.path.exists(password_file_path) else None
-        hashed_password = None
+        user_password = None
         set_user_password()  # Prompt to set a new password
 
-# Load hashed password on startup
+# Load user password on startup
 load_user_password()
 
 # GUI elements
