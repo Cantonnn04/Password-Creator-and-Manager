@@ -112,10 +112,10 @@ def generate_passwords():
     
     # Display new passwords
     for i, password in enumerate(passwords):
-        password_label = tk.Label(password_frame, text=password)
+        password_label = tk.Label(password_frame, text=password, bg="#52555a")
         password_label.grid(row=i, column=0, padx=5, pady=2, sticky="w")
         
-        copy_button = tk.Button(password_frame, text="Copy", command=lambda p=password: copy_to_clipboard(p))
+        copy_button = tk.Button(password_frame, text="Copy", command=lambda p=password: copy_to_clipboard(p), bg="#555555", activebackground="#555555")
         copy_button.grid(row=i, column=1, padx=5, pady=2)
 
 # Function to copy a password to the clipboard
@@ -167,48 +167,48 @@ def reset_notes_and_password():
 load_user_password()
 
 # GUI elements
-w = tk.Label(main_frame, text='Password Generator', fg="white")
-w.configure(bg="#555555")
+w = tk.Label(main_frame, text='Password Generator', fg="white", bd=.5, relief="solid", width=17)
+w.configure(bg="#52555a")
 w.grid(row=0, column=0, columnspan=2, pady=10)
 
-l = tk.Label(main_frame, text='Notes', fg="white")
-l.configure(bg="#555555")
+l = tk.Label(main_frame, text='Notes', fg="white", bd=.5, relief="solid", width=7)
+l.configure(bg="#52555a")
 l.grid(row=0, column=2, sticky='n', pady=10)
 
 # Checkbuttons for options
-Numbers = tk.Checkbutton(main_frame, text='Numbers')
+Numbers = tk.Checkbutton(main_frame, text='Numbers', bg="#555555")
 Numbers.var = tk.BooleanVar()  
 Numbers.config(variable=Numbers.var)
 Numbers.grid(row=1, column=0, sticky="w")
 
-Capitals = tk.Checkbutton(main_frame, text='Capital Letters')
+Capitals = tk.Checkbutton(main_frame, text='Capital Letters', bg="#555555")
 Capitals.var = tk.BooleanVar()
 Capitals.config(variable=Capitals.var)
 Capitals.grid(row=2, column=0, sticky="w")
 
-SpecialChar = tk.Checkbutton(main_frame, text='Special Characters')
+SpecialChar = tk.Checkbutton(main_frame, text='Special Characters', bg="#555555")
 SpecialChar.var = tk.BooleanVar()
 SpecialChar.config(variable=SpecialChar.var)
 SpecialChar.grid(row=3, column=0, sticky="w")
 
 # Entry for password length
-LengthLabel = tk.Label(main_frame, text='Password Length (Max 25)')
+LengthLabel = tk.Label(main_frame, text='Password Length (Max 25)', bg="#555555")
 LengthLabel.grid(row=4, column=0, sticky="w")
 
-length = tk.Entry(main_frame, validate='key', validatecommand=validate, width=10)
+length = tk.Entry(main_frame, validate='key', validatecommand=validate, width=10, bd=1, relief="solid")
 length.grid(row=4, column=1, padx=5)
 
 # Generate button
-button = tk.Button(main_frame, text='Generate', width=30, command=generate_passwords)
+button = tk.Button(main_frame, text='Generate', width=30, command=generate_passwords, bg="#52555a", activebackground="#52555a", bd=2, relief="solid")
 button.grid(row=5, column=0, columnspan=2, padx=5, pady=3)
 
 # Frame to display generated passwords below the "Generate" button
-password_frame = tk.Frame(main_frame)
+password_frame = tk.Frame(main_frame, bd=2, relief="solid")
 password_frame.configure(bg="#52555a")
 password_frame.grid(row=6, column=0, columnspan=2, pady=10, sticky="w")
 
 # Textbox for notes or to view generated passwords
-textbox = tk.Text(main_frame, height=10, width=20)
+textbox = tk.Text(main_frame, height=10, width=20, bd=1, relief="solid")
 textbox.grid(row=1, column=2, rowspan=5, padx=10, pady=5, sticky="n")
 
 # Frame for buttons below the textbox to keep them in one place
@@ -217,15 +217,15 @@ button_frame.configure(bg="#555555")
 button_frame.grid(row=6, column=2, sticky="n")
 
 # Save button to save textbox contents
-save_button = tk.Button(button_frame, text="Save", command=save_textbox_contents)
+save_button = tk.Button(button_frame, text="Save", command=save_textbox_contents, bg="#52555a", activebackground="#52555a", bd=2, relief="solid")
 save_button.pack(pady=5)
 
 # See notes button
-see_button = tk.Button(button_frame, text="See Notes", command=see_notes)
+see_button = tk.Button(button_frame, text="See Notes", command=see_notes, bg="#52555a", activebackground="#52555a", bd=2, relief="solid")
 see_button.pack(pady=5)
 
 # Reset button for notes and password
-reset_button = tk.Button(button_frame, text="Reset Notes/Password", command=reset_notes_and_password)
+reset_button = tk.Button(button_frame, text="Reset Notes/Password", command=reset_notes_and_password, bg="#52555a", activebackground="#52555a", bd=2, relief="solid")
 reset_button.pack(pady=5)
 
 # Run the application
