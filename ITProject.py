@@ -29,6 +29,7 @@ def set_file_permissions(filepath):
 
 # Create the main application window
 m = tk.Tk()
+m.configure(bg="#555555")
 m.geometry("475x400")  # Increase width to allow more space for padding
 m.resizable(False, False)
 m.title('Password Tool')
@@ -36,6 +37,7 @@ m.title('Password Tool')
 # Create a main frame to center-align with padding
 main_frame = tk.Frame(m, padx=20, pady=10)  # Adjust padx for side padding
 main_frame.pack(expand=False)
+main_frame.configure(bg="#555555")
 
 # Function to validate input for password length
 def NumOnly(new_value):
@@ -184,10 +186,12 @@ def reset_notes_and_password():
 load_user_password()
 
 # GUI elements
-w = tk.Label(main_frame, text='Password Generator')
+w = tk.Label(main_frame, text='Password Generator', fg="white")
+w.configure(bg="#555555")
 w.grid(row=0, column=0, columnspan=2, pady=10)
 
-l = tk.Label(main_frame, text='Notes')
+l = tk.Label(main_frame, text='Notes', fg="white")
+l.configure(bg="#555555")
 l.grid(row=0, column=2, sticky='n', pady=10)
 
 # Checkbuttons for options
@@ -219,6 +223,7 @@ button.grid(row=5, column=0, columnspan=2, padx=5, pady=3)
 
 # Frame to display generated passwords below the "Generate" button
 password_frame = tk.Frame(main_frame)
+password_frame.configure(bg="#52555a")
 password_frame.grid(row=6, column=0, columnspan=2, pady=10, sticky="w")
 
 # Textbox for notes or to view generated passwords
@@ -227,6 +232,7 @@ textbox.grid(row=1, column=2, rowspan=5, padx=10, pady=5, sticky="n")
 
 # Frame for buttons below the textbox to keep them in one place
 button_frame = tk.Frame(main_frame)
+button_frame.configure(bg="#555555")
 button_frame.grid(row=6, column=2, sticky="n")
 
 # Save button to save textbox contents
