@@ -87,12 +87,17 @@ def set_user_password():
 def load_user_password():
     global user_password_hash
     password_file_path = get_file_path("user_password.txt")
+    notes_file_path = get_file_path("user_notes.txt")
+    
     if os.path.exists(password_file_path):
         with open(password_file_path, "rb") as file:
             encrypted_password = file.read()
             user_password_hash = decrypt_data(encrypted_password, key)
     else:
-        set_user_password()
+        # If password file is missing, delete the notes file if it exists
+        if os.path.exists(notes_file_path):
+            os.remove(notes_file_path)
+        set_user_password()  # Prompt to set a new password
 
 # Function to verify the user's password
 def verify_password():
