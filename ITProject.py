@@ -6,6 +6,38 @@ import os
 import stat
 import sys
 import hashlib
+from cryptography.fernet import Fernet
+
+def generate_key():
+    return Fernet.generate_key()
+
+def save_key(key):
+    key_file_path = get_file_path("secret.key")
+    with open(key_file_path, "wb") as key_file:
+        key_file.write(key)
+
+def load_key():
+    key_file_path = get_file_path("secret.key")
+    if os.path.exists(key_file_path):
+        with open(key_file_path, "rb") as key_file:
+            return key_file.read()
+    else:
+        # Generate and save the key if it doesn't exist
+        key = generate_key()
+        save_key(key)
+        return key
+
+# Encrypt data using the provided key
+def encrypt_data(data, key):
+    f = Fernet(key)
+    encrypted_data = f.encrypt(data.encode('utf-8'))
+    return encrypted_data
+
+# Decrypt data using the provided key
+def decrypt_data(encrypted_data, key):
+    f = Fernet(key)
+    decrypted_data = f.decrypt(encrypted_data).decode('utf-8')
+    return decrypted_data
 
 # Determine the base path for data storage
 if getattr(sys, 'frozen', False):
@@ -51,6 +83,7 @@ validate = (m.register(NumOnly), '%P')
 
 # Global variable for storing hashed password
 user_password_hash = None
+key = load_key()  # Load encryption key
 
 # Function to set the user's password on first launch
 def set_user_password():
@@ -59,9 +92,10 @@ def set_user_password():
     if user_password:
         user_password_hash = hash_password(user_password)
         password_file_path = get_file_path("user_password.txt")
-        with open(password_file_path, "w") as file:
-            file.write(user_password_hash)
-        set_file_permissions(password_file_path)  # Set file permissions
+        encrypted_password = encrypt_data(user_password_hash, key)
+        with open(password_file_path, "wb") as file:
+            file.write(encrypted_password)
+        set_file_permissions(password_file_path)
         load_textbox_contents()  # Load notes after setting password
     else:
         messagebox.showwarning("Warning", "Password cannot be empty.")
@@ -71,8 +105,9 @@ def load_user_password():
     global user_password_hash
     password_file_path = get_file_path("user_password.txt")
     if os.path.exists(password_file_path):
-        with open(password_file_path, "r") as file:
-            user_password_hash = file.read().strip()
+        with open(password_file_path, "rb") as file:
+            encrypted_password = file.read()
+            user_password_hash = decrypt_data(encrypted_password, key)
     else:
         set_user_password()
 
@@ -134,8 +169,9 @@ def copy_to_clipboard(password):
 def save_textbox_contents():
     if verify_password():
         notes_file_path = get_file_path("user_notes.txt")
-        with open(notes_file_path, "w") as file:
-            file.write(textbox.get("1.0", tk.END).strip())
+        encrypted_notes = encrypt_data(textbox.get("1.0", tk.END).strip(), key)
+        with open(notes_file_path, "wb") as file:
+            file.write(encrypted_notes)
         set_file_permissions(notes_file_path)  # Set file permissions
         messagebox.showinfo("Success", "Notes saved successfully.")
     else:
@@ -145,8 +181,9 @@ def save_textbox_contents():
 def load_textbox_contents():
     notes_file_path = get_file_path("user_notes.txt")
     if os.path.exists(notes_file_path):
-        with open(notes_file_path, "r") as file:
-            content = file.read()
+        with open(notes_file_path, "rb") as file:
+            encrypted_content = file.read()
+            content = decrypt_data(encrypted_content, key)
             textbox.insert("1.0", content)
 
 # Function to see notes
