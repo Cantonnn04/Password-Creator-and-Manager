@@ -5,6 +5,7 @@ import string
 import os
 import stat
 import sys
+import hashlib
 
 # Determine the base path for data storage
 if getattr(sys, 'frozen', False):
@@ -26,6 +27,10 @@ def get_file_path(filename):
 def set_file_permissions(filepath):
     os.chmod(filepath, stat.S_IRUSR | stat.S_IWUSR)  # Read and write permissions for the owner only
 
+# Hash the password with SHA-256
+def hash_password(password):
+    return hashlib.sha256(password.encode('utf-8')).hexdigest()
+
 # Create the main application window
 m = tk.Tk()
 m.configure(bg="#555555")
@@ -44,36 +49,37 @@ def NumOnly(new_value):
 
 validate = (m.register(NumOnly), '%P')
 
-# Global variable for storing plaintext password
-user_password = None
+# Global variable for storing hashed password
+user_password_hash = None
 
 # Function to set the user's password on first launch
 def set_user_password():
-    global user_password
+    global user_password_hash
     user_password = simpledialog.askstring("Set Password", "Please set a password for your notes:", show="*")
     if user_password:
+        user_password_hash = hash_password(user_password)
         password_file_path = get_file_path("user_password.txt")
         with open(password_file_path, "w") as file:
-            file.write(user_password)
+            file.write(user_password_hash)
         set_file_permissions(password_file_path)  # Set file permissions
         load_textbox_contents()  # Load notes after setting password
     else:
         messagebox.showwarning("Warning", "Password cannot be empty.")
 
-# Function to load user password from file
+# Function to load user password hash from file
 def load_user_password():
-    global user_password
+    global user_password_hash
     password_file_path = get_file_path("user_password.txt")
     if os.path.exists(password_file_path):
         with open(password_file_path, "r") as file:
-            user_password = file.read().strip()
+            user_password_hash = file.read().strip()
     else:
         set_user_password()
 
 # Function to verify the user's password
 def verify_password():
     entered_password = simpledialog.askstring("Enter Password", "Please enter your password:", show="*")
-    return entered_password == user_password
+    return hash_password(entered_password) == user_password_hash
 
 # Function to generate passwords
 def generate_passwords():
@@ -153,14 +159,14 @@ def see_notes():
 
 # Function to reset notes and password
 def reset_notes_and_password():
-    global user_password
+    global user_password_hash
     confirm = messagebox.askyesno("Confirm Reset", "Are you sure you want to reset your notes and password?")
     if confirm:
         notes_file_path = get_file_path("user_notes.txt")
         password_file_path = get_file_path("user_password.txt")
         os.remove(notes_file_path) if os.path.exists(notes_file_path) else None
         os.remove(password_file_path) if os.path.exists(password_file_path) else None
-        user_password = None
+        user_password_hash = None
         set_user_password()  # Prompt to set a new password
 
 # Load user password on startup
@@ -195,7 +201,7 @@ SpecialChar.grid(row=3, column=0, sticky="w")
 LengthLabel = tk.Label(main_frame, text='Password Length (Max 25)', bg="#555555")
 LengthLabel.grid(row=4, column=0, sticky="w")
 
-length = tk.Entry(main_frame, validate='key', validatecommand=validate, width=10, bd=1, relief="solid")
+length = tk.Entry(main_frame, validate='key', validatecommand=validate, width=10, bd=1, relief="sol")
 length.grid(row=4, column=1, padx=5)
 
 # Generate button
